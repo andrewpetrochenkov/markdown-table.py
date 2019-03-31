@@ -17,6 +17,11 @@ class|`__doc__`
 `markdown_table.Column` |column class. attrs: `header`, `align` (`left`, `center`, `right`)
 `markdown_table.Table` |table class. attrs: `columns`, `data`
 
+#### Functions
+function|`__doc__`
+-|-
+`markdown_table.render(headers, matrix)` |return a string with markdown table (one-line cells only)
+
 <p align="center">
     <a href="https://pypi.org/project/readme-generator/">readme-generator</a>
 </p>
