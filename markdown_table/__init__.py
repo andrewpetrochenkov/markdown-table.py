@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 import public
 
 
@@ -20,16 +19,17 @@ def render(headers, matrix):
         return cells
 
     headers = list(map(lambda s: line1(s).lstrip().rstrip(), headers))
+    separators = []
+    for i in range(0, len(headers)):
+        separators.append("-")
     matrix = list(map(lambda cols: one_line_cells(cols, headers), matrix))
-    if matrix:
-        return """%s
--|-
-%s""" % ("|".join(headers), "\n".join(map(lambda r: "|".join(r), matrix)))
+    lines = ["|".join(headers), "|".join(separators)] + list(map(lambda r: "|".join(r), matrix))
+    return "\n".join(lines)
 
 
 @public.add
 class Column:
-    """column class. attrs: `header`, `align` (`left`, `center`, `right`)"""
+    """attrs: `header`, `align` (`left`, `center`, `right`)"""
     align = "left"
 
     def __init__(self, header, align="left"):
@@ -45,18 +45,20 @@ class Column:
 
 @public.add
 class Table:
-    """table class. attrs: `columns`, `data`"""
-    columns = []
-    data = []
+    """attrs: `columns`, `matrix`. methods: `getheaders()`, `getseparators()`, `getmatrix()`, `render()`"""
+    columns = None
+    matrix = None
 
-    def __init__(self, columns, data):
+    def __init__(self, columns, matrix):
         self.columns = list(columns)
-        self.data = list(data)
+        self.matrix = list(matrix)
 
-    def get_headers(self):
+    def getheaders(self):
+        """return a list of headers"""
         return self.columns
 
-    def get_alignments(self):
+    def getseparators(self):
+        """return a list of separators"""
         values = []
         for column in self.columns:
             align = getattr(column, "align", "left")
@@ -64,27 +66,20 @@ class Table:
             values.append(value)
         return values
 
-    def get_data(self):
-        return self.data
+    def getmatrix(self):
+        """return a matrix with data"""
+        return self.matrix
 
     def render(self):
         """return a string with markdown table (if data not empty)"""
-        if not self.get_data():
+        matrix = self.getmatrix()
+        if not matrix:
             return ""
-        return "\n".join([
-            "|".join(self.get_headers()),
-            "|".join(self.get_alignments()),
-        ] + list(map(lambda r: " |".join(r), self.get_data())))
-
-    def save(self, path):
-        """save markdown table to a file"""
-        dirname = os.path.dirname(path)
-        if not dirname and not os.path.exists(dirname):
-            os.makedirs(dirname)
-        open(path, "w").write(str(self))
+        lines = ["|".join(self.getheaders()), "|".join(self.getseparators())] + list(map(lambda r: " |".join(r), matrix))
+        return "\n".join(lines)
 
     def __bool__(self):
-        return len(self.get_data()) > 0
+        return len(self.getmatrix()) > 0
 
     def __nonzero__(self):
         return self.__bool__()
