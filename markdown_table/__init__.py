@@ -1,9 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-import public
+__all__ = ['render', 'Column', 'Table']
 
 
-@public.add
 def render(headers, matrix):
     """return a string with markdown table (one-line cells only)"""
     def line1(string):
@@ -23,11 +20,11 @@ def render(headers, matrix):
     for i in range(0, len(headers)):
         separators.append("-")
     matrix = list(map(lambda cols: one_line_cells(cols, headers), matrix))
-    lines = ["|".join(headers), "|".join(separators)] + list(map(lambda r: "|".join(r), matrix))
+    lines = ["|".join(headers), "|".join(separators)] + \
+        list(map(lambda r: "|".join(r), matrix))
     return "\n".join(lines)
 
 
-@public.add
 class Column:
     """attrs: `header`, `align` (`left`, `center`, `right`)"""
     align = "left"
@@ -43,7 +40,6 @@ class Column:
         return self.__str__()
 
 
-@public.add
 class Table:
     """attrs: `columns`, `matrix`. methods: `getheaders()`, `getseparators()`, `getmatrix()`, `render()`"""
     columns = None
@@ -75,7 +71,8 @@ class Table:
         matrix = self.getmatrix()
         if not matrix:
             return ""
-        lines = ["|".join(self.getheaders()), "|".join(self.getseparators())] + list(map(lambda r: " |".join(r), matrix))
+        lines = ["|".join(self.getheaders()), "|".join(
+            self.getseparators())] + list(map(lambda r: " |".join(r), matrix))
         return "\n".join(lines)
 
     def __bool__(self):
